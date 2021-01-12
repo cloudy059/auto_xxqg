@@ -258,6 +258,19 @@ function wakeUpdevice() {
 }
 
 function main() {
+    // 截图权限申请
+    threads.start(function() {
+        var beginBtn;
+        if (beginBtn = classNameContains("Button").textContains("立即开始").findOne(2000)) {
+            beginBtn.click();
+        }
+    });
+    sleep(1000);
+    if (!requestScreenCapture(false)) {
+        toastLog("请求截图失败");
+        exit();
+    }
+    threads.shutDownAll(); //停止所有通过threads.start()启动的子线程	
     //等待无障碍权限
     auto.waitFor();
     //控制台显示

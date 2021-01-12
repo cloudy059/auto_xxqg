@@ -18,7 +18,7 @@ var aCatlog = xxset.article;//文章学习类别，可自定义修改为“要�
 // var aCat = ["推荐", "要闻", "综合"];
 // var aCatlog = aCat[0];//文章学习类别，随机取"推荐","要闻","综合","实践"
 
-var asub = 2; //订阅数
+// var asub = 2; //订阅数
 var lCount = 1;//挑战答题轮数
 var qCount = randomNum(5, 7);//挑战答题每轮答题数(5~7随机)
 var myScores = {};//分数
@@ -1181,7 +1181,7 @@ function getScores(i) {
 
     vCount = 6 - myScores["视听学习"];
     rTime = (6 - myScores["视听学习时长"]) * 60;
-    asub = 2 - myScores["订阅"];
+    // asub = 2 - myScores["订阅"];
     sCount = 2 - myScores["分享"] * 2
     cCount = 1 - myScores["发表观点"]
 
@@ -1434,140 +1434,127 @@ function stopRadio() {
 }
 
 /**
- @description: 学习平台订阅
+ @description: 订阅强国号
  @param: null
  @return: null
  */
-function sub1() {
-    id("home_bottom_tab_button_work").findOne().click();
-    logDefault("点击 订阅");
-    delay(2);
-    click("订阅");
-    logDefault("点击 添加");
-    delay(2);
-    click("添加");
-    // logDefault("点击 学习平台");
-    // delay(2);
-    // click("学习平台", 0); // text("学习平台").findOne().click() == click("学习平台", 0) 解决订阅问题
-    delay(2)
-    // logDefault("点击 强国号");
-    // a=click("强国号", 0)
-    // logError("a"+a);
-    let sublist = className("ListView").findOnce(0);
-    logDefault("sublist"+sublist);
-    var i = 0;
-    while (i < asub) {
-        let object = desc("订阅").find();
-        if (!object.empty()) {
-            object.forEach(function (currentValue) {
-                if (currentValue && i < asub) {
-                    let like = currentValue.parent()
-                    //logDefault("currentValue",currentValue,"like",like)
-                    if (like.click()) {
-                        logDefault("订阅成功");
-                        i++;
-                        delay(2);
-                    } else {
-                        logError("订阅失败");
-                    }
-                }
-            })
-        } else if (text("你已经看到我的底线了").exists()) {
-            logDefault("尝试订阅学习平台")
-            back();
-            delay(1);
-            click("添加");
-            delay(1);
-            click("学习平台", 0);
-            delay(2);
-            let sublist = className("ListView").findOnce(1);
-            while (i < asub) {
-                let object = desc("订阅").find();
-                if (!object.empty()) {
-                    object.forEach(function (currentValue) {
-                        if (currentValue && i < asub) {
-                            let like = currentValue.parent()
-                            if (like.click()) {
-                                logDefault("订阅成功");
-                                i++;
-                                delay(2);
-                            } else {
-                                logError("订阅失败");
-                            }
-                        }
-                    })
-                } else if (text("你已经看到我的底线了").exists()) {
-                    logDefault("没有可订阅的强国号了,退出!!!")
-                    back();
-                    delay(2);
-                    return;
-                } else {
-                    delay(1);
-                    sublist.scrollForward();
-                }
-            }
-        } else {
-            delay(1);
-            sublist.scrollForward();
-        }
-    }
-    back();
-    delay(2);
+function Subscription() {
+var listView = className("android.view.View").depth(13).findOnce(1);
+var listArray = listView.children();
+//console.log(listArray[1].child(1).text());
+
+var delayTime = 120;
+var myColor = "#e32416";
+//var myColor = "#f2f3f5";
+var myThreshold = 4;
+var isName = "";
+while (true) {
+if (isName == listArray[2].child(1).text()) {
+break;
+}
+// console.hide(); //隐藏console控制台窗口
+sleep(delayTime); //等待截屏
+var img = captureScreen(); //截个屏
+// captureScreen("./ddd.png");//截个屏
+// var img = images.read("./ddd.png");
+// console.show(); //显示console控制台窗口
+
+ isName = listArray[2].child(1).text();
+ var isFind = false;
+ listArray.some(item => {
+     // let isSub = isSubscription(delayTime, myColor, myThreshold, item.child(2));
+
+     if (item.children().length > 2) {
+         //console.log(item.child(1).text());
+         var listBounds = item.child(2).bounds();
+         // console.log(listBounds);
+         var point = findColor(img, myColor, {
+             region: [listBounds.left, listBounds.top, listBounds.right - listBounds.left, listBounds.bottom - listBounds.top],
+             threshold: myThreshold
+         });
+         if (point) {
+             // console.log(item.child(1).text());
+             console.log("已订阅");
+             item.child(2).click();
+             isFind = true;
+             sleep(1000)
+             return true;
+         } else {
+             // return false;
+         }
+     }
+     //displayColor(item.child(2).bounds().centerX() + 5, item.child(2).bounds().centerY() + 5);
+ });
+ if (!isFind) {
+     listView.scrollForward();
+     sleep(100);
+     //console.error("滑动");
+     listView = className("android.view.View").depth(13).findOnce(1);
+     listArray = listView.children();
+     if (isName == listArray[2].child(1).text()) {
+         listView.scrollForward();
+         //console.warn("滑动2");
+         listView = className("android.view.View").depth(13).findOnce(1);
+         listArray = listView.children();
+     }
+ }
+ sleep(100);
+ }
+return isFind;
 }
 
-function sub() {
-	requestScreenCapture();
-    id("home_bottom_tab_button_work").findOne().click();
-    logDefault("点击 订阅");
-    delay(2);
-    click("订阅");
-    logDefault("点击 添加");
-    delay(2);
-    click("添加");
-    while(!textContains("推荐").exists());
-    var leftList=text("推荐").findOne().parent();
-    for(var i=0;i<leftList.childCount();i++){
-        var img = captureScreen();
-        c=leftList.child(i);
-        logDefault("点击 "+c.text())
-        c.click();
-        //sleep(1000)
-        for (var m = 0; m <= 100; m++) {
-            if (m%2==0) {
-                continue;
-            }
-            var subIcon,color;
-            
-            try{
-                subIcon=className("android.widget.ImageView").depth(15).findOnce(m);
-                color = images.pixel(img, subIcon.bounds().centerX()+5, subIcon.bounds().centerY()+5);
-                console.log(subIcon.bounds().centerX()+5,subIcon.bounds().centerY()+5)
-            }catch(e){
-                //console.error("异常");
-                continue;
-            }
-            if (colors.isSimilar(color,"#E32416")) {//红色
-                delay(1);
-                subIcon.click();
-                logDefault("订阅了"+m);
-                asub--;
-                if (asub==0) {
-                    break;
-                }
-            }else{
-                logDefault("已订阅"+m);
-                delay(1);
-            }
-        }
-        if (asub==0) {
-            console.log("订阅完成");
-            break;
-        }
-        delay(1);
-    }
-    back();
-    delay(2);
+/**
+@description: 学习平台订阅
+@param: null
+@return: null
+*/
+function subScribe() {
+     h = device.height; //屏幕高
+     w = device.width; //屏幕宽
+     x = (w / 3) * 2; //横坐标2分之3处
+     h1 = (h / 6) * 5; //纵坐标6分之5处
+     h2 = (h / 6); //纵坐标6分之1处
+     while (!desc("工作").exists()); //等待加载出主页
+     desc("工作").click();
+     console.log('正在订阅...');
+     click("订阅");
+     sleep(random(1000, 2000));
+     className("android.support.v7.widget.RecyclerView").findOne().children().findOne(className("android.widget.TextView")).parent().click();
+     sleep(random(1000, 2000));
+     click("上新");
+     //click("主要央媒");
+     sleep(random(1000, 2000));
+     // click("强国号",0);
+     // console.log(className("android.widget.ListView").findOnce(0));
+     // var listView = className("android.widget.ListView").findOnce(0); //获取listView视频列表控件用于翻页
+     var i = myScores["订阅"];
+     // console.log("订阅：" + i);
+     i = 0
+     let falseNumber = 0;
+     let isSub = false;
+     while (i < 2) {
+         isSub = Subscription();
+         // console.log(isSub);
+             if (isSub) {
+                 i++;
+             } else {
+                 //break;
+                 falseNumber++;
+                 //click("推荐");
+                 //sleep(1000);
+             }
+             if (falseNumber > 2) {
+                 console.log("没有可订阅的强国号");
+                 break;
+             }
+     }
+     back();
+     //while (!desc("工作").exists());
+     desc("工作").click();
+     // click("时评");
+     sleep(1000);
 }
+ 
 /**
  * @description: 每周答题
  * @param: null
@@ -2787,10 +2774,11 @@ function xx2() {
 }
 
 function xx3() {
-    if (myScores['订阅'] != 2) {
-        logDefault("正在准备进行订阅");
-        //sub();//订阅
-        logDefault("订阅暂不可用...")
+    let curr_time = new Date();
+    let weekNum = curr_time.getDay();
+    // console.log('weekday:' + weekNum);
+    if (myScores['订阅'] < 2 && weekNum < 8) {
+        subScribe(); //订阅�学习平台
     }
 }
 
